@@ -16,6 +16,12 @@ const ChangeThemeBTN = styled.button`
   cursor: pointer;
 `
 
+const Wrapper = styled.main`
+  width: 525px;
+  padding: 0 10px;
+  margin: 0 auto;
+`
+
 function App() {
   const isDark = useRecoilValue(isDarkMode)
   const setTheme = useSetRecoilState(isDarkMode)
@@ -27,7 +33,9 @@ function App() {
         <ChangeThemeBTN onClick={changeTheme}>
           {isDark ? 'LightMode' : 'DarkMode'}
         </ChangeThemeBTN>
-        <AppRouter />
+        <Wrapper>
+          <AppRouter />
+        </Wrapper>
       </ThemeProvider>
     </>
   )
