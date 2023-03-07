@@ -1,26 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import styled, { ThemeProvider } from 'styled-components'
+import { isDarkMode } from './atoms'
+import GlobalStyle from './components/GlobalStyles'
+import AppRouter from './Router'
+import { darkTheme, lightTheme } from './theme'
+
+const ChangeThemeBTN = styled.button`
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 17px;
+  cursor: pointer;
+`
 
 function App() {
+  const isDark = useRecoilValue(isDarkMode)
+  const setTheme = useSetRecoilState(isDarkMode)
+  const changeTheme = () => setTheme((theme) => !theme)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+        <GlobalStyle />
+        <ChangeThemeBTN onClick={changeTheme}>
+          {isDark ? 'LightMode' : 'DarkMode'}
+        </ChangeThemeBTN>
+        <AppRouter />
+      </ThemeProvider>
+    </>
+  )
 }
 
-export default App;
+export default App
