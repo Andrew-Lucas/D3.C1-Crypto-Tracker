@@ -46,13 +46,10 @@ function CoinsScreen() {
     data: allCoins,
   } = useQuery<ICoins[]>('AllCoins', fetchCoins)
 
-  console.log(allCoins)
-  //https://api.coingecko.com/api/v3/coins/bitcoin/tickers
 
   return (
     <>
       <Heading>Home Coins</Heading>
-
         {isLoading ? (
           <Loading>Loading...</Loading>
         ) : isLoadingError ? (

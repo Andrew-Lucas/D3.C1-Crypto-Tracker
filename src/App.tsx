@@ -26,6 +26,7 @@ function App() {
   const isDark = useRecoilValue(isDarkMode)
   const setTheme = useSetRecoilState(isDarkMode)
   const changeTheme = () => setTheme((theme) => !theme)
+
   return (
     <>
       <ThemeProvider theme={isDark ? darkTheme : lightTheme}>

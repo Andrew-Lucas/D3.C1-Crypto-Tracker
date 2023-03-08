@@ -1,10 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from 'react'
 import { useQuery } from 'react-query'
-import { useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
+import { useSetRecoilState } from 'recoil'
 import styled from 'styled-components'
+import { back } from '../atoms'
+import BackButton from '../components/BackButton'
 import { Failed, Loading, LoadingError } from '../components/Loaders'
 import { fetchCoinDetails } from '../queryFunctions'
+import { ICoinDetail } from './ICoin'
+import Chart from './sub-routes/Chart'
+import Price from './sub-routes/Price'
 
-const Heading = styled.span`
+const Heading = styled.h1`
   display: flex;
   justify-content: center;
   font-size: 60px;
@@ -44,73 +52,32 @@ const NavTabHolder = styled.div`
   display: flex;
   justify-content: center;
   gap: 10px;
+  margin-left: 35px;
 `
 
 interface INavTab {
   isActive: boolean
 }
 const NavTab = styled.button<INavTab>`
-  padding: 10px 110px;
+  padding: 10px 115px;
   border-radius: 10px;
   background-color: ${({ theme }) => theme.btn.secondary};
-  color: ${({ theme, isActive }) =>
-    isActive ? theme.accent : theme.textColor};
+  color: ${({ theme, isActive }) => isActive && theme.accent} !important;
   border: none;
   cursor: pointer;
 `
 
-interface ICoinInfo {
-  ath: number
-  ath_change_percentage: number
-  ath_date: string
-  atl: number
-  atl_change_percentage: number
-  atl_date: string
-  circulating_supply: number
-  current_price: number
-  id: string
-  image: string
-  last_updated: string
-  market_cap_rank: number
-  max_supply: number
-  name: string
-  price_change_24h: number
-  price_change_percentage_24h: number
-  symbol: string
-  total_supply: number
-  total_volume: number
-}
-interface ITickers {
-  base: string
-  last_fetch_at: string
-  last_traded_at: string
-  market: {
-    name: string
-    identifier: string
-  }
-  target: string
-  target_coin_id: string
-  timestamp: string
-  trade_url: string
-}
-interface ICoinPrice {
-  links: {}
-  tickers: ITickers[]
-}
-interface ICoinDetail {
-  info: ICoinInfo[]
-  price: ICoinPrice
-}
-
-/*   let FIXED_PRICE
-  if (!isLoading) {
-  } */
-
 function Coin() {
   const { id } = useParams()
-  console.log(id)
   const state = useLocation()
-  console.log(state)
+
+  const isPriceRoute = state.pathname === `/${id}/price`
+  const isChartRoute = state.pathname === `/${id}/chart`
+
+  const setPath = useSetRecoilState(back)
+  useEffect(() => {
+    setPath(`/`)
+  }, [])
 
   const {
     isLoading,
@@ -118,13 +85,10 @@ function Coin() {
     error: failed,
     data: coinDetails,
   } = useQuery<ICoinDetail>(['Coin:', id], () => fetchCoinDetails(id!))
-  console.log(coinDetails)
-
-  /*   const priceRoute = state.pathname === ``
-  const chartRoute = state.pathname === `` */
 
   return (
     <>
+      <BackButton />
       {isLoading ? (
         <Loading>Loading...</Loading>
       ) : isLoadingError ? (
@@ -133,58 +97,75 @@ function Coin() {
         <Failed>Request Failed</Failed>
       ) : (
         <>
-          <Heading as="h1">{}</Heading>
-          {/* <CoinLogo src={} /> */}
+          {coinDetails?.info[0].name && (
+            <Heading>{coinDetails.info[0].name}</Heading>
+          )}
+          <CoinLogo src={coinDetails?.info[0].image} />
           <CoinSummary>
             <CoinRank>
               RANK:
               <br />
               <br />
-              {}
+              {coinDetails?.info[0].market_cap_rank}
             </CoinRank>
             <CoinSymbol>
               SYMBOL:
               <br />
               <br />
-              {}
+              {coinDetails?.info[0].symbol}
             </CoinSymbol>
             <CoinPrice>
               <b>STOCK PRICE:</b>
               <br />
-              <br />
-              {/* FIXED_PRICE */}
+              <br />${coinDetails?.info[0].current_price}
             </CoinPrice>
           </CoinSummary>
           <CoinDescription>
-            <i>{}</i>
+            <i>{coinDetails?.price.description.bg}</i>
           </CoinDescription>
           <br />
           <MarketInformation>
             <CoinTotalSupply>
               <b>Total Supply:</b>
               <br />
-              <br />
-              {}
+              <br />${coinDetails?.info[0].total_supply.toFixed(2)}
             </CoinTotalSupply>
             <CoinMaxSupply>
               <b>Max Supply:</b>
               <br />
-              <br />
-              {}
+              <br />${coinDetails?.info[0].max_supply || '0'}
             </CoinMaxSupply>
           </MarketInformation>
 
-          {/*           <NavTabHolder>
-            <Link to={}>
-              <NavTab isActive={chartRoute}>CHART</NavTab>
+          <NavTabHolder>
+            <Link to={`/${id}/chart`}>
+              <NavTab isActive={isChartRoute}>CHART</NavTab>
             </Link>
-            <Link to={}>
-              <NavTab isActive={priceRoute}>PRICE</NavTab>
+            <Link to={`/${id}/price`}>
+              <NavTab isActive={isPriceRoute}>PRICE</NavTab>
             </Link>
-          </NavTabHolder> */}
+          </NavTabHolder>
           <br />
           <br />
           <br />
+          {coinDetails && isChartRoute && (
+            <Chart
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              failed={failed}
+              data={coinDetails.ohlv}
+              id={id}
+            />
+          )}
+          {coinDetails && isPriceRoute && (
+            <Price
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              failed={failed}
+              priceData={coinDetails.price}
+              id={id}
+            />
+          )}
         </>
       )}
     </>

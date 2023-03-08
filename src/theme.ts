@@ -10,10 +10,10 @@ export const darkTheme = {
 
 export const lightTheme = {
   accent: "royalblue",
-  bgColor: "whitesmoke",
+  bgColor: "gainsboro",
   textColor: "#0f0f0f",
   btn: {
-    primary: "gray",
-    secondary: "whitesmoke"
+    primary: "grey",
+    secondary: "white",
   }
 }
