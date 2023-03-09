@@ -54,6 +54,5 @@
   "devDependencies": {
     "@types/styled-components": "^5.1.26",
     "gh-pages": "^5.0.0"
-  },
-  "homepage": "https://Andrew-Lucas.github.io/D3.C1-Crypto-Tracker"
+  }
 }

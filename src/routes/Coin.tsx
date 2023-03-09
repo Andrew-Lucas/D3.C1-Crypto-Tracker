@@ -75,9 +75,8 @@ function Coin() {
   const isChartRoute = state.pathname === `/${id}/chart`
 
   const setPath = useSetRecoilState(back)
-  useEffect(() => {
-    setPath(`/`)
-  }, [])
+  setPath(`/`)
+
 
   const {
     isLoading,
